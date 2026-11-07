@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<title>JIB Allocator</title>
+	<!-- the distrJIButor lol -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no" />
+	<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+	<h1> Hi </h1>
+	<p> This is a simple tool to determine JIB invoice amounts based on working interest partner shares </p><br>
+
+	<p> Currency Type </p><br>
+
+<!-- Operator information input fields -->
+	<fieldset id="OperatorInfo">
+		<legend>Operator &amp; Property Information</legend>
+
+		<label for="OperatorName">Operator Name</label><br>
+		<input type="text" id="OperatorName" placeholder="Operator name"><br><br>
+
+		<label for="OperatorAddressLine1">Address Line 1</label><br>
+		<input type="text" id="OperatorAddressLine1"><br><br>
+
+		<label for="OperatorAddressLine2">Address Line 2</label><br>
+		<input type="text" id="OperatorAddressLine2"><br><br>
+	
+		<label for="OperatorAddressCity">City</label><br>
+		<input type="text" id="OperatorAddressCity"><br><br>
+	
+		<label for="OperatorAddressState">State</label><br>
+		<input type="text" id="OperatorAddressState"><br><br>
+	
+		<label for="OperatorAddressZipcode">Zipcode</label><br>
+		<input type="text" id="OperatorAddressZipcode"><br><br>
+	
+		<label for="OperatorContact">Phone or Email</label><br>
+		<input type="text" id="OperatorContact"><br><br>
+	
+		<label for="OperatorWebsite">Operator Website</label><br>
+		<input type="text" id="OperatorWebsite" placeholder="enter link"><br><br>
+		
+		<label for="WellName">Property / Well Name</label><br>
+		<input type="text" id="WellName"><br><br>
+	
+		<label for="ApiNumber">API Number</label><br>
+		<input type="text" id="ApiNumber"><br><br>
+		
+		<label for="BillingPeriod">Billing Period</label><br>
+		<input type="month" id="BillingPeriod"><br><br>
+	
+		<label for="StatementNumber">Statement Number</label><br>
+		<input type="text" id="StatementNumber"><br><br>
+	</fieldset>
+
+	<p> Total Working Interest must equal 1 </p>
+
+	<!-- JIB allocation calculation table -->
+	<button onclick="showAllocator();">JIB Allocator</button><br><br>
+	<div id="JIBallocator" style="display:none">	
+	<p> Percentage/Decimal Interest Toggle </p>
+	<table id="JIBcalc" cellspacing=0 border=1>
+	<tbody>
+		<tr>
+			<th>Partner Name</th>
+			<th>Gross Amount</th>
+			<th>Working Interest</th>
+			<th>Partner Amount</th>
+		</tr>
+		<tr>
+			<th><input type="text" placeholder="enter partner name" id="PartnerName"></input></th>
+			<th><input type="number" placeholder="enter gross amount" id="GrossAmount"></input></th>
+			<th><input type="text" placeholder="enter working interest (decimal)" id="WorkingInterest"></input></th>
+			<th id="PartnerAmount"></th>
+		</tr>
+		<tr>
+			<th>Totals:</th>
+			<th></th>
+			<th></th>
+			<th></th>
+		</tr>
+	</tbody>
+	</table>
+
+	<button onclick="JibCalcAddRow('JIBcalc');">Enter</button><br><br>
+	
+	<!-- Generate JIB Allocation Report -->
+	<button onclick="showReport(); exportTableToCsv('JIBcalc');">Generate Report</button><br><br>
+	<div id="GenerateReport" style="display:none">
+	<p>Hi</p>
+	<iframe id="csvFrame" width="700" height="500"></iframe>
+	<iframe id="pdfFrame" width="700" height="500"></iframe> <br>
+
+		<!-- Download Report -->
+	<button onclick="downloadCsv('JIBcalc', 'JibAllocationCsv.csv');">Download Report</button><br><br>
+
+	</div>
+
+	</div>
+
+	<!-- JIB statements section -->
+	<button onclick="showJIBstatements();">JIB Statements</button><br><br>
+	<div id="JIBstatements" style="display:none">
+<!-- Partner Information Input Fields -->
+	<fieldset id="PartnerInfo">
+		<legend>Partner &amp; Property Information</legend>
+		
+		<label for="InvoiceeName">Partner Name</label><br>
+		<select id="InvoiceeName" onchange="clearPartnerFields();">
+			<option value="">--Select a partner--</option>
+		</select><br><br>
+
+		<label for="PartnerAddressLine1">Address Line 1</label><br>
+		<input type="text" id="PartnerAddressLine1"><br><br>
+
+		<label for="PartnerAddressLine2">Address Line 2</label><br>
+		<input type="text" id="PartnerAddressLine2"><br><br>
+	
+		<label for="PartnerAddressCity">City</label><br>
+		<input type="text" id="PartnerAddressCity"><br><br>
+
+		<label for="PartnerAddressState">State</label><br>
+		<input type="text" id="PartnerAddressState"><br><br>
+
+		<label for="PartnerAddressZipcode">Zipcode</label><br>
+		<input type="text" id="PartnerAddressZipcode"><br><br>
+
+		<button type="button" onclick="showPartnerInfo();">Submit Partner Information</button>
+	</fieldset><br>
+
+	<!-- JIB statements -->
+	<table id="interestsTable" cellspacing=0 border=1> <!-- partner list table -->
+	<tbody>
+		<tr>
+			<th>Partner Name</th>
+			<th>Working Interest</th>
+		</tr>
+	</tbody>
+	</table><br>
+
+	<select id="InvoiceeSelection" onchange="updatePartnerDisplay();">
+		<option value"">--Select a partner--</option>
+	</select><br><br>
+	<div id="PartnerInfoDisplay" style="display:none"></div>
+
+	<table id="JIBstatement" cellspacing=0 border=1> <!-- JIB statements table -->
+	<tbody>
+		<tr>
+			<th>Code</th>
+			<th>Description</th>
+			<th>Source</th>
+			<th>Date</th>
+			<th>Gross Amount</th>
+			<th>Partner Share</th>
+			<th>Partner Amount</th>
+		</tr>
+		<tr>
+			<th><input type="text" placeholder="enter expense code" id="ExpenseCode"></input></th>
+			<th><input type="text" placeholder="enter expense description" id="ExpenseDescrip"></input></th>
+			<th><input type="text" placeholder="enter expense source" id="ExpenseSource"></input></th>
+			<th><input type="date" placeholder="enter expense date" id="ExpenseDate"></input></th>
+			<th><input type="text" placeholder="enter gross amount" id="ExpenseGrossAmount"></input></th>
+			<th id="WorkingInterest"></th>
+			<th id="ExpensePartnerAmount"></th>
+		</tr>
+		<tr>
+			<th>Totals:</th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+		</tr>
+	</tbody>
+	</table>
+
+	<button onclick="JibStatementAddRow('JIBstatement');">Enter</button><br><br>
+
+	<!-- Generate JIB Allocation Report -->
+	<button onclick="showStatement(); exportJibStatementToCsv('JIBstatement');">Generate Report</button><br><br>
+	<div id="GenerateStatement" style="display:none">
+	<p>Hi</p>
+	<iframe id="jibStatementCsvFrame" width="700" height="500"></iframe>
+	<iframe id="jibStatementPdfFrame" width="700" height="500"></iframe> <br>
+
+		<!-- Download Report -->
+	<button onclick="downloadCsv('JIBcalc', 'JibAllocationCsv.csv');">Download Report</button><br><br>
+
+	</div>
+
+	</div>
+	
+	<p> This application does not record data, calculation and report generation occur only locally within the browser. </p>
+
+	<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+	<script src="app.js" ></script>
+</body>
+</html>
